@@ -22,7 +22,7 @@ def tulemus():
 print("Alustan!")
 
 # IP kaamera(telefon)
-#vs = cv2.VideoCapture('http://192.168.1.115:8080/video', cv2.CAP_DSHOW)
+#vs = cv2.VideoCapture('http://192.168.1.115:8080/video')
 
 # Arvuti kaamera
 vs = cv2.VideoCapture(0, cv2.CAP_DSHOW)
