@@ -16,6 +16,7 @@ def tulemus():
     andmed = {
         "Info":barcodeData,
         "Type":barcodeType,
+        "Time":barcodeTime,
         }
     return(andmed)
 
@@ -32,8 +33,9 @@ frame_rate = 10
 prev_time = 0
 
 while True:
-    # loeb kaamera kaadri
     time_elapsed = time.time() - prev_time
+    
+    # loeb kaamera kaadri
     ret, frame = vs.read()
     frame = imutils.resize(frame, width = 200)
     
@@ -56,6 +58,10 @@ while True:
             # Kasti ülesse kuvab QR- või võõtkoodi info
             text = "{} ({})".format(barcodeData, barcodeType)
             cv2.putText(frame, text, (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+            
+            # QR- või võõtkoodi tuvastamise aeg
+            barcodeTime = time.localtime()
+            barcodeTime = time.strftime("%Y-%m-%d %H:%M:%S", barcodeTime)
 
             # Salvestab vastuvõetud info andmebaasi
             if col.count_documents({"Info": barcodeData}) > 0:
