@@ -29,16 +29,16 @@ vs = cv2.VideoCapture(0)
 
 # FPS määramine
 frame_rate = 10
-prev = 0
+prev_time = 0
 
 while True:
     # loeb kaamera kaadri
-    time_elapsed = time.time() - prev
+    time_elapsed = time.time() - prev_time
     ret, frame = vs.read()
     frame = imutils.resize(frame, width = 200)
     
     if time_elapsed > 1./frame_rate:
-        prev = time.time()
+        prev_time = time.time()
         print(time_elapsed)
 
         # QR- ja võõtkoodi dekooder
