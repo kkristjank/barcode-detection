@@ -22,43 +22,47 @@ def tulemus():
 print("Alustan!")
 
 # IP kaamera(telefon)
-#vs = cv2.VideoCapture('http://192.168.1.115:8080/video')
+#vs = cv2.VideoCapture('http://192.168.213.8:8080/video')
 
 # Arvuti kaamera
-vs = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+vs = cv2.VideoCapture(0)
 
-# Frame rate muutmine ( ei tööta )
-vs.set(cv2.CAP_PROP_FPS, 10)
-fps = vs.get(cv2.CAP_PROP_FPS)
-print(fps)
+# FPS määramine
+frame_rate = 10
+prev = 0
 
 while True:
     # loeb kaamera kaadri
+    time_elapsed = time.time() - prev
     ret, frame = vs.read()
-    #frame = imutils.resize(frame, width = 400)
-
-    # QR- ja võõtkoodi dekooder
-    barcodes = pyzbar.decode(frame)
+    frame = imutils.resize(frame, width = 200)
     
-    for barcode in barcodes:
-        # QR- või võõtkoodi info
-        barcodeData = barcode.data.decode("utf-8")
-        barcodeType = barcode.type
+    if time_elapsed > 1./frame_rate:
+        prev = time.time()
+        print(time_elapsed)
 
-        # Kuvab videoedastusel olevale QR- või võõtkoodile kasti ümber
-        (x, y, w, h) = barcode.rect
-        cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 0, 255), 2)
+        # QR- ja võõtkoodi dekooder
+        barcodes = pyzbar.decode(frame)
+        
+        for barcode in barcodes:
+            # QR- või võõtkoodi info
+            barcodeData = barcode.data.decode("utf-8")
+            barcodeType = barcode.type
 
-        # Kasti ülesse kuvab QR- või võõtkoodi info
-        text = "{} ({})".format(barcodeData, barcodeType)
-        cv2.putText(frame, text, (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+            # Kuvab videoedastusel olevale QR- või võõtkoodile kasti ümber
+            (x, y, w, h) = barcode.rect
+            cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 0, 255), 2)
 
-        # Salvestab vastuvõetud info andmebaasi
-        if col.count_documents({"Info": barcodeData}) > 0:
-            print("Olemas!")
-        else:
-            save = col.insert_one(tulemus())
-            print("Uus info lisatud!")
+            # Kasti ülesse kuvab QR- või võõtkoodi info
+            text = "{} ({})".format(barcodeData, barcodeType)
+            cv2.putText(frame, text, (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+
+            # Salvestab vastuvõetud info andmebaasi
+            if col.count_documents({"Info": barcodeData}) > 0:
+                print("Olemas!")
+            else:
+                save = col.insert_one(tulemus())
+                print("Uus info lisatud!")
 
     # Edastab pildi
     cv2.imshow("Barcode Scanner", frame)
